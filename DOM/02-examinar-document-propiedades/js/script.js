@@ -42,9 +42,9 @@ links.forEach((a) => console.log(a.href));
 
 //crea una funcion que al ejecutarla en el interprete
 //cambie todas las imágenes de la página por una imagen random
-// const imgs = Array.from(document.images);
-// imgs.forEach((img) => (img.src = "https://cataas.com/cat/gif"));
-// console.log(output);
+const imgs = Array.from(document.images);
+imgs.forEach((img) => (img.src = "https://cataas.com/cat/gif"));
+console.log(output);
 
 //Obtener clases
 output = document.links[0].className;

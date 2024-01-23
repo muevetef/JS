@@ -92,9 +92,7 @@ header h1 {
 .btn-clear:hover {
   background-color: #de1616;
 }
-.btn-clear:disabled {
-  background-color: #6f6d6d;
-}
+
 .text-red {
   color: #f41818;
 }

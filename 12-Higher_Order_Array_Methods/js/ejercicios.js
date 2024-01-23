@@ -88,5 +88,5 @@ console.log(readingHobbyPersonas);
 // Resultado esperado: true/false
 // Ejercicio 6: Encuentra la persona con la edad exacta de 29 añosusando find
 // Resultado esperado: { nombre: 'Eve', ... }
-// Ejercicio 7: Ordena las personas por edad de forma descendente usandosort
+// Ejercicio 7: Ordena las personas por edad de forma descendente usando sort
 // Resultado esperado: [{ nombre: 'Bob', edad: 35, ... }, ...]
