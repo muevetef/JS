@@ -119,3 +119,21 @@ function removeChild(itemNum) {
   const li = document.querySelectorAll("li");
   li[itemNum - 1].remove();
 }
+
+//Dos formas de eliminar todos los items
+function removeAll1() {
+  const ul = document.querySelector("ul");
+  ul.textContent = "";
+}
+
+function removeAll2() {
+  const list = document.querySelectorAll("li");
+  list.forEach((li) => li.remove());
+}
+
+function removeAll3() {
+  const list = document.querySelector("ul");
+  while (list.firstChild) {
+    list.removeChild(list.firstChild);
+  }
+}
