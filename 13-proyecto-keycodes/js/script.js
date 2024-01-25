@@ -1,6 +1,9 @@
+/**
+ * @param {KeyboardEvent} e
+ */
 function getKeyCodeBackticks(e) {
   const insertDiv = document.querySelector("#insert");
-  console.log(e);
+
   insertDiv.innerHTML = `<div class="key">
                             ${e.key === " " ? "Espacio" : e.key}
                             <small>e.key</small>
