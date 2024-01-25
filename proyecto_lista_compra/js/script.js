@@ -6,6 +6,18 @@ const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
 
 /**
+ * @description Obtiene datos del Storage i refresca la lista
+ */
+function displayItems() {
+  const lista = getItemsFromStorage();
+  lista.forEach((item) => {
+    const li = createNewItem(item);
+    itemList.appendChild(li);
+  });
+  checkUI();
+}
+
+/**
  *
  * @param {SubmitEvent} evt
  */
@@ -23,11 +35,17 @@ function addItem(evt) {
   //Sinó, creamos el li y lo añadimos a la lista
   const li = createNewItem(newItem);
   itemList.appendChild(li);
+
+  //Añadimos a localStorage
+  addItemToLocalStorage(newItem);
+
+  //Mirar si es el primero
+  checkUI();
   //Limpiamos el campo
   itemInput.value = "";
 }
 
-/***** Funciones de creacion de elementos *****/
+/***** Funciones de creacion de elementos en la vista *****/
 function createNewItem(textItem) {
   const li = document.createElement("li");
   const text = document.createTextNode(textItem);
@@ -58,13 +76,46 @@ function clearAll() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+  checkUI();
 }
 
 function removeItem(evt) {
   if (evt.target.parentElement.classList.contains("remove-item")) {
     evt.target.parentElement.parentElement.remove();
   }
+  removeItemToLocalStorage(evt.target.parentElement.parentElement.innerText);
+  checkUI();
 }
+/****** LocalStorage ********/
+function addItemToLocalStorage(item) {
+  //traer los datos del localdtage
+  const itemsFromStorage = getItemsFromStorage();
+  //añadir el elemento al array
+  itemsFromStorage.push(item);
+  //Pasarlo a texto y guardar
+  localStorage.setItem("lista", JSON.stringify(itemsFromStorage));
+}
+
+function getItemsFromStorage() {
+  let itemsFromStorage;
+  if (localStorage.getItem("lista") === null) {
+    itemsFromStorage = [];
+  } else {
+    itemsFromStorage = JSON.parse(localStorage.getItem("lista"));
+  }
+
+  return itemsFromStorage;
+}
+
+function removeItemToLocalStorage(item) {
+  //traer los datos del localdtage
+  let itemsFromStorage = getItemsFromStorage();
+  //eliminar el elemento al array
+  itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+  //Pasarlo a texto y guardar
+  localStorage.setItem("lista", JSON.stringify(itemsFromStorage));
+}
+
 /*******funcion de filtro *****/
 function filterItems(evt) {
   // const items = itemList.children;
@@ -81,6 +132,19 @@ function filterItems(evt) {
     }
   });
 }
+
+/****** function para mirar si hay elementos en la lista *****/
+function checkUI() {
+  const items = itemList.querySelectorAll("li");
+  console.log(items);
+  if (items.length > 0) {
+    clearBtn.style.display = "block";
+    itemFilter.style.display = "block";
+  } else {
+    clearBtn.style.display = "none";
+    itemFilter.style.display = "none";
+  }
+}
 /*****  Event listeners  *****/
 /**
  * Al generarse el evento submit, añadimos un item
@@ -89,3 +153,4 @@ itemForm.addEventListener("submit", addItem);
 clearBtn.addEventListener("click", clearAll);
 itemList.addEventListener("click", removeItem);
 itemFilter.addEventListener("input", filterItems);
+document.addEventListener("DOMContentLoaded", displayItems);
