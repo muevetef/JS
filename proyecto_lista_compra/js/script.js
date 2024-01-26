@@ -4,6 +4,8 @@ const itemInput = document.getElementById("item-input");
 const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
+const formBtn = itemForm.querySelector(".btn");
+let isEditMode = false;
 
 /**
  * @description Obtiene datos del Storage i refresca la lista
@@ -31,11 +33,23 @@ function addItem(evt) {
     alert("Por favor añado un texto");
     return;
   }
-  if (checkIfItemExists(newItem)) {
-    alert("El Item ya existe");
-    itemInput.value = "";
-    return;
+
+  // Miramos si estamos en modo edicion
+  if (isEditMode) {
+    //Eliminar el elemento seleccionado
+    const itemToEdit = document.querySelector(".edit-mode");
+
+    removeItemToLocalStorage(itemToEdit.textContent);
+    itemToEdit.remove();
+    isEditMode = false;
+  } else {
+    if (checkIfItemExists(newItem)) {
+      alert("El Item ya existe");
+      itemInput.value = "";
+      return;
+    }
   }
+
   //Sinó, creamos el li y lo añadimos a la lista
   const li = createNewItem(newItem);
   itemList.appendChild(li);
@@ -74,7 +88,28 @@ function createIcon(clases) {
   icon.className = clases;
   return icon;
 }
+/**** Mirar si eliminar o editar ****/
+function onclickItem(evt) {
+  if (evt.target.parentElement.classList.contains("remove-item")) {
+    removeItem(evt.target.parentElement.parentElement);
+  } else {
+    setItemToEdit(evt.target);
+  }
+}
 
+/***** Modo edicion *******/
+function setItemToEdit(item) {
+  isEditMode = true;
+
+  itemList
+    .querySelectorAll("li")
+    .forEach((item) => item.classList.remove("edit-mode"));
+
+  item.classList.add("edit-mode");
+  formBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Actualizar Item';
+  formBtn.style.backgroundColor = "#228b22";
+  itemInput.value = item.textContent;
+}
 /***** Funciones de eliminar elementos ******/
 function clearAll() {
   while (itemList.firstChild) {
@@ -85,12 +120,12 @@ function clearAll() {
   checkUI();
 }
 
-function removeItem(evt) {
-  if (evt.target.parentElement.classList.contains("remove-item")) {
-    evt.target.parentElement.parentElement.remove();
+function removeItem(item) {
+  if (confirm("Quieres eliminar el Item?")) {
+    item.remove();
+    removeItemToLocalStorage(item.textContent);
+    checkUI();
   }
-  removeItemToLocalStorage(evt.target.parentElement.parentElement.innerText);
-  checkUI();
 }
 /****** LocalStorage ********/
 function addItemToLocalStorage(item) {
@@ -130,6 +165,7 @@ function checkIfItemExists(item) {
   //Mirar si existe
   return items.includes(item);
 }
+
 /*******funcion de filtro *****/
 function filterItems(evt) {
   // const items = itemList.children;
@@ -157,6 +193,11 @@ function checkUI() {
     clearBtn.style.display = "flex";
     itemFilter.style.display = "flex";
   }
+
+  formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Añadir Item';
+  formBtn.style.backgroundColor = "#333";
+
+  isEditMode = false;
 }
 /*****  Event listeners  *****/
 /**
@@ -165,6 +206,8 @@ function checkUI() {
 
 itemForm.addEventListener("submit", addItem);
 clearBtn.addEventListener("click", clearAll);
-itemList.addEventListener("click", removeItem);
+itemList.addEventListener("click", onclickItem);
 itemFilter.addEventListener("input", filterItems);
 document.addEventListener("DOMContentLoaded", displayItems);
+
+//TODO que en modo edicion no se pueda eliminar ningun Item
