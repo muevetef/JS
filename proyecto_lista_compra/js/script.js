@@ -31,7 +31,11 @@ function addItem(evt) {
     alert("Por favor añado un texto");
     return;
   }
-
+  if (checkIfItemExists(newItem)) {
+    alert("El Item ya existe");
+    itemInput.value = "";
+    return;
+  }
   //Sinó, creamos el li y lo añadimos a la lista
   const li = createNewItem(newItem);
   itemList.appendChild(li);
@@ -76,6 +80,8 @@ function clearAll() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+  //Limpiar lista de LocalStorage
+  localStorage.removeItem("lista");
   checkUI();
 }
 
@@ -115,7 +121,15 @@ function removeItemToLocalStorage(item) {
   //Pasarlo a texto y guardar
   localStorage.setItem("lista", JSON.stringify(itemsFromStorage));
 }
-
+/**
+ * @description mira si el elemento existe en local
+ */
+function checkIfItemExists(item) {
+  //Obtener los elementos guardados
+  const items = getItemsFromStorage();
+  //Mirar si existe
+  return items.includes(item);
+}
 /*******funcion de filtro *****/
 function filterItems(evt) {
   // const items = itemList.children;
@@ -136,19 +150,19 @@ function filterItems(evt) {
 /****** function para mirar si hay elementos en la lista *****/
 function checkUI() {
   const items = itemList.querySelectorAll("li");
-  console.log(items);
-  if (items.length > 0) {
-    clearBtn.style.display = "block";
-    itemFilter.style.display = "block";
-  } else {
+  if (items.length === 0) {
     clearBtn.style.display = "none";
     itemFilter.style.display = "none";
+  } else {
+    clearBtn.style.display = "flex";
+    itemFilter.style.display = "flex";
   }
 }
 /*****  Event listeners  *****/
 /**
  * Al generarse el evento submit, añadimos un item
  */
+
 itemForm.addEventListener("submit", addItem);
 clearBtn.addEventListener("click", clearAll);
 itemList.addEventListener("click", removeItem);
