@@ -38,26 +38,41 @@ function addItem(evt) {
   if (isEditMode) {
     //Eliminar el elemento seleccionado
     const itemToEdit = document.querySelector(".edit-mode");
+    const oldIndex = checkIfItemExists(itemToEdit.textContent);
+    
+    if (itemToEdit.textContent !== newItem){
+      if (checkIfItemExists(newItem) !== -1) {
+        alert("El Item ya existe");
+        itemInput.value = "";
+        return;
+      }
+      
+      updateItemToLocalStorage(newItem, oldIndex);
+      itemToEdit.textContent = newItem;
+      const button = createButton("remove-item btn-link text-red");
+      itemToEdit.appendChild(button);
+      
+    }
+    itemToEdit.classList.remove("edit-mode");
 
-    removeItemToLocalStorage(itemToEdit.textContent);
-    itemToEdit.remove();
     isEditMode = false;
   } else {
-    if (checkIfItemExists(newItem)) {
+    if (checkIfItemExists(newItem) !== -1) {
       alert("El Item ya existe");
       itemInput.value = "";
       return;
     }
+
+    //Sinó, creamos el li y lo añadimos a la lista
+    const li = createNewItem(newItem);
+    itemList.appendChild(li);
+
+    //Añadimos a localStorage
+    addItemToLocalStorage(newItem);
+
+    //Mirar si es el primero
+  
   }
-
-  //Sinó, creamos el li y lo añadimos a la lista
-  const li = createNewItem(newItem);
-  itemList.appendChild(li);
-
-  //Añadimos a localStorage
-  addItemToLocalStorage(newItem);
-
-  //Mirar si es el primero
   checkUI();
   //Limpiamos el campo
   itemInput.value = "";
@@ -92,7 +107,7 @@ function createIcon(clases) {
 function onclickItem(evt) {
   if (evt.target.parentElement.classList.contains("remove-item")) {
     removeItem(evt.target.parentElement.parentElement);
-  } else {
+  } else if (evt.target.tagName === "LI") {
     setItemToEdit(evt.target);
   }
 }
@@ -101,9 +116,12 @@ function onclickItem(evt) {
 function setItemToEdit(item) {
   isEditMode = true;
 
-  itemList
-    .querySelectorAll("li")
-    .forEach((item) => item.classList.remove("edit-mode"));
+  itemList.querySelectorAll("li").forEach((item) => {
+    item.classList.remove("edit-mode");
+    item.querySelector("i").style.color = "#ccc";
+  });
+
+  itemList.removeEventListener("click", onclickItem);
 
   item.classList.add("edit-mode");
   formBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Actualizar Item';
@@ -136,7 +154,14 @@ function addItemToLocalStorage(item) {
   //Pasarlo a texto y guardar
   localStorage.setItem("lista", JSON.stringify(itemsFromStorage));
 }
-
+function updateItemToLocalStorage(item, oldIndex) {
+  //traer los datos del localdtage
+  const itemsFromStorage = getItemsFromStorage();
+  //añadir el elemento al array
+  itemsFromStorage.splice(oldIndex, 1, item);
+  //Pasarlo a texto y guardar
+  localStorage.setItem("lista", JSON.stringify(itemsFromStorage));
+}
 function getItemsFromStorage() {
   let itemsFromStorage;
   if (localStorage.getItem("lista") === null) {
@@ -163,7 +188,7 @@ function checkIfItemExists(item) {
   //Obtener los elementos guardados
   const items = getItemsFromStorage();
   //Mirar si existe
-  return items.includes(item);
+  return items.indexOf(item);
 }
 
 /*******funcion de filtro *****/
@@ -197,6 +222,10 @@ function checkUI() {
   formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Añadir Item';
   formBtn.style.backgroundColor = "#333";
 
+  items.forEach((item) => {
+    item.querySelector("i").style.color = "red";
+  });
+  itemList.addEventListener("click", onclickItem);
   isEditMode = false;
 }
 /*****  Event listeners  *****/
@@ -211,3 +240,5 @@ itemFilter.addEventListener("input", filterItems);
 document.addEventListener("DOMContentLoaded", displayItems);
 
 //TODO que en modo edicion no se pueda eliminar ningun Item
+
+
