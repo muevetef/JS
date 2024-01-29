@@ -14,6 +14,12 @@ xhr.onreadystatechange = function () {
   */
   if (this.readyState === 4 && this.status === 200) {
     const data = JSON.parse(this.responseText);
+    data.forEach((repo) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${repo.name}</strong> -  
+                      <a href=${repo.html_url}> Ir al repositorio</a>`;
+      document.querySelector("#repos").appendChild(li);
+    });
     console.log(data);
   }
 };
