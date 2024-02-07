@@ -34,7 +34,7 @@
           const formData = new FormData();
           formData.append("image", selectedFile);
 
-          fetch("http://docker.muevetef:8888/images/", {
+          fetch("http://docker.muevetef:8888/images/toni/", {
             method: "POST",
             body: formData,
           })
